@@ -1,0 +1,51 @@
+name: "Create repository secrets to a specific secondary repository"
+description: "Create repository secrets to a specific secondary repository"
+author: "Avinash"
+inputs:
+  secret_name:
+    description: "Secret name that needs to be create on a repo - it must have permission to create a secret for the specified repository"
+    required: true
+  secret_value:
+    description: "Secret value that needs to be create on a repo"
+    required: true
+  environment:
+    description: "Environment where the secret to be create. Ex: dev, non-prod, prod etc"
+    required: true
+  organization:
+    description: "Comma separated list of repo names to create a environment"
+    required: true
+  repository:
+    description: "Comma separated list of repo names to create a environment"
+    required: true    
+runs:
+  using: "composite"
+  steps:
+    - name: 'Check out repository'
+      uses: actions/checkout@v4
+    - name: Create Secrets
+      shell: bash
+      run: |
+        key_id=$(gh api \
+            --method GET  \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'X-GitHub-Api-Version:2022-11-28' \
+            /repos/"${{inputs.organization}}"/"${{inputs.repository}}"/environments/"${{inputs.environment}}"/secrets/public-key | jq -r '.key_id')
+
+        echo $key_id
+
+        gh api \
+          --method PUT  \
+          --header 'Accept: application/vnd.github+json' \
+          --header 'X-GitHub-Api-Version:2022-11-28' \
+          /repos/"${{inputs.organization}}"/"${{inputs.repository}}"/environments/"${{inputs.environment}}"/secrets/"${{inputs.secret_name}}" \
+            -f encrypted_value="${{inputs.secret_value}}" \
+          -f key_id=$key_id
+
+    - name: Validate Secrets
+      shell: bash
+      run: |
+        gh api \
+          --method GET  \
+          --header 'Accept: application/vnd.github+json' \
+          --header 'X-GitHub-Api-Version:2022-11-28' \
+          /repos/"${{inputs.organization}}"/"${{inputs.repository}}"/environments/"${{inputs.environment}}"/secrets/"${{inputs.secret_name}}"
