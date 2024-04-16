@@ -16,7 +16,10 @@ inputs:
     required: true
   repository:
     description: "Comma separated list of repo names to create a environment"
-    required: true    
+    required: true
+branding:
+  icon: 'activity'
+  color: 'white'    
 runs:
   using: "composite"
   steps:
