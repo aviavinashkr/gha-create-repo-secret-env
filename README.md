@@ -20,13 +20,13 @@ jobs:
     - uses: actions/checkout@master
     - name: Run action
 
-      uses: nestle-it/gha-create-repo-secret-for-env@main
+      uses: <orgnization>/gha-create-repo-secret-for-env@main
       with:
         GitHubToken: ${{ secrets.PAT }}
         SecretName: "secret-name"
         SecretValue: "secret-value"
         Environment: "dev"
-        Organization: "nestle-it"
+        Organization: "<orgnization>"
         Repository: "repository name"
 
 ```
@@ -55,6 +55,6 @@ This is how to use the optional input.
       SecretName: "ClientID"
       SecretValue: "ClientID_Value"
       Environment: "dev"
-      Organization: "nestle-it"
+      Organization: "<orgnization>"
       Repository: "npet-testingsolutionrepo"
 ```
